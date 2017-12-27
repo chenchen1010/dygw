@@ -1,0 +1,40 @@
+#encoding=UTF-8
+from aip import AipNlp
+import jieba
+
+""" 你的 APPID AK SK """
+APP_ID = '10591142'
+API_KEY = '9LG94wMVQTeWXAv6nj7HKBAu'
+SECRET_KEY = '1WMG4tH7bsMhPn3fWGZhtWnnHDdZ7G0a'
+
+client = AipNlp(APP_ID, API_KEY, SECRET_KEY)
+
+
+text = "百度是一家高科技公司"
+
+""" 调用词法分析 """
+list = client.lexer(text)['items']
+print(list)
+for i in range(len(list)):
+    print(list[i]['item'] + " " + list[i]['pos'])#"".join(list[i]['basic_words']
+
+
+seg_list = jieba.cut("我来到北京清华大学", cut_all=True)
+print("Full Mode: " + "/ ".join(seg_list))  # 全模式
+
+seg_list = jieba.cut("我来到北京清华大学", cut_all=False)
+print("Default Mode: " + "/ ".join(seg_list))  # 精确模式
+
+seg_list = jieba.cut("他来到了网易杭研大厦")  # 默认是精确模式
+print(", ".join(seg_list))
+
+seg_list = jieba.cut_for_search("小明硕士毕业于中国科学院计算所，后在日本京都大学深造")  # 搜索引擎模式
+print(", ".join(seg_list))
+
+import jieba.posseg as pseg
+
+str = '''上午七点三十五分，石神像平常一样离开公寓。虽已进入三月，风还是相当冷，他把下巴埋在围巾里迈步走出。走上马路前，他先瞥了一眼脚踏车停车场。那里放着几辆车，但是没有他在意的绿色脚踏车。'''
+
+words = pseg.cut(str)
+for word, flag in words:
+    print('%s %s' % (word, flag))
