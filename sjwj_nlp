@@ -1,6 +1,7 @@
 #encoding=UTF-8
 from aip import AipNlp
 import jieba
+import os
 
 """ 你的 APPID AK SK """
 APP_ID = '10591142'
@@ -9,32 +10,73 @@ SECRET_KEY = '1WMG4tH7bsMhPn3fWGZhtWnnHDdZ7G0a'
 
 client = AipNlp(APP_ID, API_KEY, SECRET_KEY)
 
-
-text = "百度是一家高科技公司"
-
-""" 调用词法分析 """
-list = client.lexer(text)['items']
-print(list)
-for i in range(len(list)):
-    print(list[i]['item'] + " " + list[i]['pos'])#"".join(list[i]['basic_words']
+file_names = os.listdir('./txt')
+file_names = [x.strip('.txt') for x in file_names]
 
 
-seg_list = jieba.cut("我来到北京清华大学", cut_all=True)
-print("Full Mode: " + "/ ".join(seg_list))  # 全模式
 
-seg_list = jieba.cut("我来到北京清华大学", cut_all=False)
-print("Default Mode: " + "/ ".join(seg_list))  # 精确模式
+# print(file_names)
+for x in file_names:
+    print("正在处理 "+x+".txt...")
 
-seg_list = jieba.cut("他来到了网易杭研大厦")  # 默认是精确模式
-print(", ".join(seg_list))
+    # 预处理每个txt，只需要完成一次
+    # s = ""
+    # with open("./txt/"+x+".txt", encoding='GBK') as f: #打开txt
+    #     for line in f:
+    #         line = line.strip('\n')
+    #         line = line.strip()
+    #         s = s + line
+    #         # print(line)
+    # # print(texts)#是按照换行符分割成list了
+    # # print(s)
+    # with open('./output/qk_'+x+'.txt','w') as f1:
+    #     f1.write(s)
 
-seg_list = jieba.cut_for_search("小明硕士毕业于中国科学院计算所，后在日本京都大学深造")  # 搜索引擎模式
-print(", ".join(seg_list))
+    # print(line)
 
-import jieba.posseg as pseg
 
-str = '''上午七点三十五分，石神像平常一样离开公寓。虽已进入三月，风还是相当冷，他把下巴埋在围巾里迈步走出。走上马路前，他先瞥了一眼脚踏车停车场。那里放着几辆车，但是没有他在意的绿色脚踏车。'''
 
-words = pseg.cut(str)
-for word, flag in words:
-    print('%s %s' % (word, flag))
+    with open('./output/qk_'+x+'.txt', encoding='GBK') as f: #打开txt
+        texts = f.readlines()
+    # print(texts)
+    strall = texts[0]
+    lenall = len(strall)
+    # print(lenall)
+    if lenall>10000:
+        n = int(lenall/10000)
+    else:
+        n = 0
+    # print('n={}'.format(n))
+
+    # a = strall[0:10000]
+    # print(a)
+    # b = strall[10000:20000]
+    # print(b)
+
+    name = []#结果输出list
+    name1 = []
+    adress = []
+    for i in range(0,n+1):
+        detecttxt = strall[i*10000:i*10000+10000]
+        if detecttxt != "":#x非空
+            for y in client.lexer(detecttxt)['items']:##注意！！！这个里面的输入不能是[]空，for循环处理每句话，
+                # if y['ne']=='PER':                  #太好时间了，并且后面有地方报错，不便于调试。
+                #     name.append(y['item'])
+                # if y['pos']=='nr':
+                #     name1.append(y['item'])
+                if y['ne']=='LOC':
+                    adress.append(y['item'])
+
+    # print(name)
+    # print(name1)
+    # print(adress)
+    # s_name = ' '.join(name)
+    # print(s_name)
+
+    # os.mkdir(r'./output')
+    # with open('./output/name_'+x+'.txt','w') as f1:
+    #     f1.write(s_name)
+    s_adress = ' '.join(adress)
+    with open('./output/adress_'+x+'.txt','w') as f1:
+        f1.write(s_adress)
+
